@@ -37,7 +37,16 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
 	try {
-		const response = await fetch("http://localhost:5000/api/user", {
+		// Récupère l'ID depuis les query params : ?id=...
+		const url = new URL(request.url);
+		const id = url.searchParams.get("id");
+
+		const base = process.env.BACKEND_URL || "http://localhost:5000";
+		const endpoint = id
+			? `${base}/api/user/${encodeURIComponent(id)}`
+			: `${base}/api/user`;
+
+		const response = await fetch(endpoint, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -46,8 +55,12 @@ export async function GET(request: Request) {
 			},
 		});
 
-		return new Response(JSON.stringify({ data: response }), {
-			status: 200,
+		// Propager le corps JSON renvoyé par le backend
+		const data = await response.json();
+
+		return new Response(JSON.stringify({ data }), {
+			status: response.ok ? 200 : response.status,
+			headers: { "Content-Type": "application/json" },
 		});
 	} catch (error) {
 		console.error("Error fetching users:", error);
@@ -57,6 +70,29 @@ export async function GET(request: Request) {
 		);
 	}
 }
+
+// export async function GET(request: Request) {
+// 	try {
+// 		const response = await fetch("http://localhost:5000/api/user", {
+// 			method: "GET",
+// 			headers: {
+// 				"Content-Type": "application/json",
+// 				"Access-Control-Allow-Origin": "*",
+// 				"no-cors": "true",
+// 			},
+// 		});
+
+// 		return new Response(JSON.stringify({ data: response }), {
+// 			status: 200,
+// 		});
+// 	} catch (error) {
+// 		console.error("Error fetching users:", error);
+// 		return Response.json(
+// 			{ error: "Internal Server Error" },
+// 			{ status: 500 }
+// 		);
+// 	}
+// }
 
 // export async function PUT(request: Request) {
 // 	try {

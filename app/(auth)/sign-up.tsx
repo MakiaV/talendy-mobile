@@ -32,6 +32,8 @@ const SignUp = () => {
 		defaultValues: {
 			email: "",
 			password: "",
+			firstName: "",
+			lastName: "",
 		},
 	});
 
@@ -42,6 +44,8 @@ const SignUp = () => {
 	const [form, setForm] = useState({
 		email: "",
 		password: "",
+		firstName: "",
+		lastName: "",
 	});
 
 	const [pendingVerification, setPendingVerification] = useState(false);
@@ -53,9 +57,13 @@ const SignUp = () => {
 	const onSubmit = async ({
 		email,
 		password,
+		firstName,
+		lastName,
 	}: {
 		email: string;
 		password: string;
+		firstName: string;
+		lastName: string;
 	}) => {
 		setOnSubmitError("");
 		if (!isLoaded) return;
@@ -66,6 +74,8 @@ const SignUp = () => {
 			await signUp.create({
 				emailAddress: email,
 				password,
+				firstName,
+				lastName,
 			});
 
 			// Send user an email with verification code
@@ -73,7 +83,7 @@ const SignUp = () => {
 				strategy: "email_code",
 			});
 
-			setForm({ email, password });
+			setForm({ email, password, firstName, lastName });
 
 			// Set 'pendingVerification' to true to display second form
 			// and capture OTP code
@@ -102,27 +112,57 @@ const SignUp = () => {
 			// and redirect the user
 			if (signUpAttempt.status === "complete") {
 				try {
-					const response = await fetch("/(api)/user", {
-						method: "POST",
-						// headers: {
-						// 	"Content-Type": "application/json",
-						// 	"Access-Control-Allow-Origin": "*",
-						// 	"no-cors": "true",
-						// },
-						body: JSON.stringify({
-							email: form.email,
-							password: form.password,
-							clerkId: signUpAttempt.createdUserId,
-						}),
-					});
+					// const response = await fetch("/(api)/user", {
+					// 	method: "POST",
+					// 	// headers: {
+					// 	// 	"Content-Type": "application/json",
+					// 	// 	"Access-Control-Allow-Origin": "*",
+					// 	// 	"no-cors": "true",
+					// 	// },
+					// 	body: JSON.stringify({
+					// 		email: form.email,
+					// 		password: form.password,
+					// 		clerkId: signUpAttempt.createdUserId,
+					// 	}),
+					// });
+
+					// if (!response.ok) {
+					// 	new Error(`HTTP error! status: ${response.status}`);
+					// }
+
+					const response = await fetch(
+						`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/user/register`,
+						// "http://localhost:5000/api/user/register",
+						{
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								"Access-Control-Allow-Origin": "*",
+								"no-cors": "true",
+							},
+							body: JSON.stringify({
+								email: form.email,
+								password: form.password,
+								clerkId: signUpAttempt.createdUserId,
+								firstName: form.firstName,
+								lastName: form.lastName,
+							}),
+						}
+					);
 
 					if (!response.ok) {
 						new Error(`HTTP error! status: ${response.status}`);
 					}
+					// console.log("User created:", await response.json());
+
+					// Set session to active
 					await setActive({
 						session: signUpAttempt.createdSessionId,
 					});
 					router.replace("/");
+					return new Response(JSON.stringify({ data: response }), {
+						status: 201,
+					});
 					// return await response.json();
 				} catch (error) {
 					console.error("Fetch error:", error);
@@ -214,6 +254,23 @@ const SignUp = () => {
 						Create an account to start your journey
 					</Text>
 				</View>
+
+				<CustomInputField
+					errors={errors}
+					control={control}
+					name="firstName"
+					placeholder="First Name"
+					icon={<Feather name="user" size={22} color="gray" />}
+					autoCapitalize="none"
+				/>
+				<CustomInputField
+					errors={errors}
+					control={control}
+					name="lastName"
+					placeholder="Last Name"
+					icon={<Feather name="user" size={22} color="gray" />}
+					autoCapitalize="none"
+				/>
 
 				<CustomInputField
 					errors={errors}

@@ -41,6 +41,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const SignIn = () => {
 	useWarmUpBrowser();
+	// const { user } = useUser();
 
 	const {
 		control,
@@ -80,11 +81,51 @@ const SignIn = () => {
 
 			// If sign-in process is complete, set the created session as active
 			// and redirect the user
+
 			if (signInAttempt.status === "complete") {
 				await setActive({
 					session: signInAttempt.createdSessionId,
 				});
-				router.replace("/");
+
+				// try {
+				// 	// const token = await getToken();
+				// 	const clerkUserId = user?.id;
+
+				// 	const res = await fetch(
+				// 		`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/user/${clerkUserId}`,
+				// 		{
+				// 			method: "GET",
+				// 			headers: {
+				// 				"Content-Type": "application/json",
+				// 				"Access-Control-Allow-Origin": "*",
+				// 				"no-cors": "true",
+				// 			},
+				// 		}
+				// 	);
+
+				// 	if (!res.ok)
+				// 		throw new Error(
+				// 			"Erreur de synchronisation avec le backend"
+				// 		);
+
+				// 	const data = await res.json();
+
+				// 	if (data?.role === "APPLICANT") {
+				// 		router.push("/applicant");
+				// 	} else if (data?.role === "RECRUITER") {
+				// 		router.push("/company");
+				// 	} else {
+				// 		// router.replace("/");
+				// 		router.push("/");
+				// 	}
+
+				// 	// console.log("✅ Utilisateur synchronisé :", data);
+				// } catch (error) {
+				// 	console.error("Erreur de sync:", error);
+				// }
+
+				// router.replace("/");
+				router.replace("/(applicant)/applicant");
 			} else {
 				// If the status isn't complete, check why. User might need to
 				// complete further steps.

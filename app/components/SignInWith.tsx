@@ -35,7 +35,7 @@ export default function SignInWith({ strategy }: SignInWithProps) {
 	const router = useRouter();
 	const { user, isLoaded } = useUser();
 	const { getToken } = useAuth();
-	console.log("user", user);
+	// console.log("user", user);
 
 	// Use the `useSSO()` hook to access the `startSSOFlow()` method
 	const { startSSOFlow } = useSSO();

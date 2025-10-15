@@ -22,7 +22,7 @@ const SignOutButton = () => {
 	return (
 		<Pressable
 			onPress={handleSignOut}
-			className="border border-gray-400 px-4 py-1 rounded-[10px] w-1/4 mx-auto my-4"
+			className="border border-gray-400 px-4 py-1 rounded-[10px] w-fit mx-auto my-4"
 		>
 			<Text className="text-red-600 text-center">Sign Out</Text>
 		</Pressable>
