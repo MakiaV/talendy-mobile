@@ -1,21 +1,28 @@
 import { useUser } from "@clerk/clerk-expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import CustomButton from "../CustomButton";
 
-type Role = "APPLICANT" | "RECRUITER" | null;
+type Role = "APPLICANT" | "RECRUITER" | "";
 
 const WhoAreYou = () => {
 	const { user, isLoaded } = useUser();
 	// const { getToken } = useAuth();
-	// console.log("user in WhoAreYou", user?.firstName, user?.lastName);
-	const [role, setRole] = useState<Role>(null);
+	const [role, setRole] = useState<Role>("");
 	const [backendUser, setBackendUser] = useState<any>();
-	// console.log("backendUser in WhoAreYou", backendUser);
-	// console.log("role", role);
 
 	const router = useRouter();
+
+	const storeData = async (value: Role) => {
+		try {
+			await AsyncStorage.setItem("role", value);
+		} catch (e) {
+			// saving error
+			console.log("error", e);
+		}
+	};
 
 	useEffect(() => {
 		const getBackendUser = async () => {
@@ -92,8 +99,10 @@ const WhoAreYou = () => {
 			// console.log("✅ Utilisateur synchronisé :", data);
 
 			if (role === "APPLICANT") {
+				storeData("APPLICANT");
 				router.push("/applicant");
 			} else if (role === "RECRUITER") {
+				storeData("RECRUITER");
 				router.push("/company");
 			}
 		} catch (error) {

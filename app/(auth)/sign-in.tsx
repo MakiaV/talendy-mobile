@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 
 import CustomLogo from "@/app/components/CustomLogo";
@@ -39,9 +40,28 @@ export const useWarmUpBrowser = () => {
 
 WebBrowser.maybeCompleteAuthSession();
 
+type Role = "APPLICANT" | "RECRUITER" | "";
+
 const SignIn = () => {
 	useWarmUpBrowser();
-	// const { user } = useUser();
+	const [role, setRole] = useState<Role>("");
+
+	useEffect(() => {
+		const getData = async () => {
+			try {
+				const value = (await AsyncStorage.getItem("role")) as Role;
+
+				if (value !== "") {
+					// value previously stored
+					setRole(value);
+				}
+			} catch (e) {
+				// error reading value
+				console.log("error", e);
+			}
+		};
+		getData();
+	}, []);
 
 	const {
 		control,
@@ -87,45 +107,13 @@ const SignIn = () => {
 					session: signInAttempt.createdSessionId,
 				});
 
-				// try {
-				// 	// const token = await getToken();
-				// 	const clerkUserId = user?.id;
-
-				// 	const res = await fetch(
-				// 		`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/user/${clerkUserId}`,
-				// 		{
-				// 			method: "GET",
-				// 			headers: {
-				// 				"Content-Type": "application/json",
-				// 				"Access-Control-Allow-Origin": "*",
-				// 				"no-cors": "true",
-				// 			},
-				// 		}
-				// 	);
-
-				// 	if (!res.ok)
-				// 		throw new Error(
-				// 			"Erreur de synchronisation avec le backend"
-				// 		);
-
-				// 	const data = await res.json();
-
-				// 	if (data?.role === "APPLICANT") {
-				// 		router.push("/applicant");
-				// 	} else if (data?.role === "RECRUITER") {
-				// 		router.push("/company");
-				// 	} else {
-				// 		// router.replace("/");
-				// 		router.push("/");
-				// 	}
-
-				// 	// console.log("✅ Utilisateur synchronisé :", data);
-				// } catch (error) {
-				// 	console.error("Erreur de sync:", error);
-				// }
-
-				// router.replace("/");
-				router.replace("/(applicant)/applicant");
+				if (role === "APPLICANT") {
+					router.replace("/applicant");
+				} else if (role === "RECRUITER") {
+					router.replace("/company");
+				} else {
+					router.replace("/");
+				}
 			} else {
 				// If the status isn't complete, check why. User might need to
 				// complete further steps.
@@ -233,33 +221,6 @@ const SignIn = () => {
 						<SignInWith strategy="oauth_google" />
 
 						<SignInWith strategy="oauth_facebook" />
-						{/* <Pressable
-							onPress={onPressGoogle}
-							className="border w-[55px] h-[55px] rounded-[10px] border-talendy-inputBorder p-4 flex items-center justify-center self-center"
-						>
-							<Image
-								source={require("@/assets/images/google.png")}
-								className="object-contain h-[40px] w-[40px]"
-							/>
-						</Pressable>
-						<Pressable
-							onPress={onPressLinkedin}
-							className="border w-[55px] h-[55px] rounded-[10px] border-talendy-inputBorder p-4 flex items-center justify-center self-center"
-						>
-							<Image
-								source={require("@/assets/images/linkedin.png")}
-								className="object-contain h-[40px] w-[40px]"
-							/>
-						</Pressable>
-						<Pressable
-							onPress={onPressFacebook}
-							className="border w-[55px] h-[55px] rounded-[10px] border-talendy-inputBorder p-4 flex items-center justify-center self-center"
-						>
-							<Image
-								source={require("@/assets/images/facebook.png")}
-								className="object-contain h-[40px] w-[40px]"
-							/>
-						</Pressable> */}
 					</View>
 				</View>
 
