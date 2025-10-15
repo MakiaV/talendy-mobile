@@ -1,4 +1,5 @@
 import { useClerk } from "@clerk/clerk-expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Pressable, Text } from "react-native";
 
@@ -10,6 +11,9 @@ const SignOutButton = () => {
 	const handleSignOut = async () => {
 		try {
 			await signOut();
+
+			await AsyncStorage.removeItem("role");
+
 			// Redirect to your desired page
 			router.replace("/");
 		} catch (err) {

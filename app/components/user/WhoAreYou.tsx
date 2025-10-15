@@ -69,14 +69,12 @@ const WhoAreYou = () => {
 	};
 
 	const handleSubmit = async () => {
-		console.log("role submit", role);
 		if (!role || !user || !backendUser) return;
 		// router.push("/applicant");
 		try {
 			// const token = await getToken();
 			const clerkUserId = user?.id;
 			const updatedUser = { ...backendUser, role: role };
-			console.log("updatedUser", updatedUser);
 
 			const res = await fetch(
 				`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/user/${clerkUserId}`,
@@ -97,6 +95,33 @@ const WhoAreYou = () => {
 			const data = await res.json();
 			setBackendUser(data);
 			// console.log("✅ Utilisateur synchronisé :", data);
+
+			try {
+				const clerkId = user?.id;
+
+				const response = await fetch(
+					`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/applicant/create`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Access-Control-Allow-Origin": "*",
+							"no-cors": "true",
+						},
+						body: JSON.stringify({ clerkId }),
+					}
+				);
+				if (!response.ok)
+					throw new Error(
+						"Erreur de synchronisation avec le backend"
+					);
+
+				const applicantData = await response.json();
+
+				console.log("✅ Applicant créé :", applicantData);
+			} catch (error) {
+				console.error("Erreur de sync:", error);
+			}
 
 			if (role === "APPLICANT") {
 				storeData("APPLICANT");

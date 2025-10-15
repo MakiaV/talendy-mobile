@@ -112,24 +112,6 @@ const SignUp = () => {
 			// and redirect the user
 			if (signUpAttempt.status === "complete") {
 				try {
-					// const response = await fetch("/(api)/user", {
-					// 	method: "POST",
-					// 	// headers: {
-					// 	// 	"Content-Type": "application/json",
-					// 	// 	"Access-Control-Allow-Origin": "*",
-					// 	// 	"no-cors": "true",
-					// 	// },
-					// 	body: JSON.stringify({
-					// 		email: form.email,
-					// 		password: form.password,
-					// 		clerkId: signUpAttempt.createdUserId,
-					// 	}),
-					// });
-
-					// if (!response.ok) {
-					// 	new Error(`HTTP error! status: ${response.status}`);
-					// }
-
 					const response = await fetch(
 						`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/user/register`,
 						// "http://localhost:5000/api/user/register",

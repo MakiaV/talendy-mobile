@@ -30,7 +30,7 @@ const HomePage = () => {
 			}
 		};
 		getData();
-	}, []);
+	}, [isLoaded, router]);
 
 	return (
 		<View className="p-5">
